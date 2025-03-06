@@ -72,4 +72,6 @@ powerStatus OBJECT-TYPE                                                         
 
 ### 配置文件编写&模版
 supportFile 文件夹下存放了 huawei硬件的mib文件以及编写好的采集对应指标的配置文件。<p>
-格式可参考 supportFile/Huawei_snmp_file/huawei.yaml
+格式可参考 supportFile/Huawei_snmp_file/huawei.yaml<p>
+
+使用时可以通过 mib 浏览器打开给出的 mib 文件；并且对照着编写好的 huawei.yaml 配置文件以供理解。
