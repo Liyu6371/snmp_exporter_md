@@ -1,0 +1,84 @@
+
+-- File Name : ZTE-PLAT-SMI
+-- Date      : Wed May 09 01:39:27 GMT 2007
+-- Author    : ZTE CORPORATION
+
+
+
+ZTE-PLAT-SMI	DEFINITIONS ::= BEGIN
+	IMPORTS
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		enterprises, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY
+			FROM SNMPv2-SMI;
+
+	zte	MODULE-IDENTITY
+		LAST-UPDATED	"200704290204Z"
+		ORGANIZATION	"ZTE CORPORATION"
+		CONTACT-INFO	"ZTE Plaza, Keji Road South, Hi-Tech Industrial Park, Nanshan District, Shenzhen, P. R. China
+                         Post code: 518057
+                         Customer Support Center: (86) 755 26771900    800-9830-9830
+                         Fax: (86) 755 26772236
+                         Website: http://support.zte.com.cn
+                         E-mail: doc@zte.com.cn"
+		DESCRIPTION		"The Structure of Management Information for the ZTE enterprise."
+		REVISION		"200710210204Z"
+		DESCRIPTION		"Define this SMI for ZTE ATCA Product"
+		::=  {  enterprises  3902  }
+   
+    ebsProduct	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  zte  6053  } 
+    
+    ebsProductName	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  ebsProduct  19  }		
+		
+
+    ebs	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  ebsProductName  1  }
+		
+    ccs	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  ebsProductName  2  }
+		
+    rast	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		""
+		::=  {  ebs  3  }
+
+
+
+	anyservice	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Anyservice will provide network carriers with complete, omnidirectional and diversified service product solutions"
+		::=  {  zte  150  }
+
+	vas	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Value-added Service"
+		::=  {  anyservice  11  }
+
+	sysproducts	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"The System Product of vas"
+		::=  {  vas  5  }
+		
+	unmi	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Unified Network Management Interface"
+		::=  {  vas  6  }
+
+	atca	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Atca Platform product"
+		::=  {  sysproducts  10  }
+
+		
+
+END

@@ -1,0 +1,5683 @@
+ZTE-3GPLAT-snmp-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    rast
+        FROM ZTE-PLAT-SMI
+    enterprises,IpAddress, Integer32, 
+    OBJECT-TYPE,MODULE-IDENTITY
+        FROM SNMPv2-SMI                              -- RFC2578
+    RowStatus, DisplayString
+        FROM SNMPv2-TC;                              -- RFC2579
+
+bmc MODULE-IDENTITY
+    LAST-UPDATED      "202411020000Z"                    
+    ORGANIZATION      "rast working group,zte Telecom. Co." 
+    CONTACT-INFO      ""
+    DESCRIPTION       
+        "The Module for zte rast bmc."
+    ::= { rast 2 }
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.2
+boardPower OBJECT IDENTIFIER ::= {bmc 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.2.1
+powerStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   powerOff(0), -- get/set value
+                   powerOn(1), -- get/set value
+                   coldRestart(2), -- set value. It means power off first, then power on
+                   restart(3), -- set value. This operation do not power off the device
+                   softShutDown(5) -- set value
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Power status
+"
+    ::= {boardPower 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3
+bootType OBJECT IDENTIFIER ::= {bmc 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3.1
+bootDevSelector OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   noOverride(0),
+                   pxeBoot(4),
+                   hardDiskBoot(8),
+                   remotelyHdd(11),
+                   cdRomBoot(20),
+                   bIOSBoot(24),
+                   uSBBoot(60)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Boot device selector
+"
+    ::= {bootType 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3.2
+effectType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   once(0),
+                   persistent(1)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Effect type
+"
+    ::= {bootType 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3.3
+bootModel OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   legacy(0),
+                   uefi(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Boot model
+"
+    ::= {bootType 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3.4
+bootFlagValid OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   invalid(0),
+                   valid(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Boot flag valid
+"
+    ::= {bootType 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.3.5
+bmcBootFlagValidBitClearing OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   clear(0),
+                   notclear(1)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "BMC 60s clear boot flag valid bit
+"
+    ::= {bootType 5}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.5
+boardPowerPolicy OBJECT IDENTIFIER ::= {bmc 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.5.1
+powerPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   keepOff(0),
+                   restoreTheStatusBeforePowerOff(1),
+                   automaticPowerOn(2)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Power on policy
+"
+    ::= {boardPowerPolicy 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6
+boardDeviceid OBJECT IDENTIFIER ::= {bmc 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.1
+deviceId OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Device ID
+"
+    ::= {boardDeviceid 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.2
+devicePad OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserve
+"
+    ::= {boardDeviceid 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.3
+additionalDeviceSupport OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The lowest bit of the value indicates whether additional devices id
+          enabled"
+    ::= {boardDeviceid 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.4
+ipmiVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "IPMI Version
+"
+    ::= {boardDeviceid 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.5
+firmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware Revision
+"
+    ::= {boardDeviceid 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.6
+manufactureid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Manufacture ID
+"
+    ::= {boardDeviceid 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.7
+compileTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Software Compile Time
+"
+    ::= {boardDeviceid 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.8
+productid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product ID
+"
+    ::= {boardDeviceid 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.6.9
+deviceRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Device Revision
+"
+    ::= {boardDeviceid 9}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.10
+uidState OBJECT IDENTIFIER ::= {bmc 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.10.1
+uidStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   lightOff(1),
+                   lightOn(2),
+                   lightBlinkIn1Hz(3)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uid Status
+"
+    ::= {uidState 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.11
+uidOn OBJECT IDENTIFIER ::= {bmc 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.11.1
+setUidOn OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   lightOn(1)
+               }
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION 
+        "Set the light on
+"
+    ::= {uidOn 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.12
+uidOff OBJECT IDENTIFIER ::= {bmc 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.12.1
+setUidOff OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   lightoff(1)
+               }
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION 
+        "Set the light off
+"
+    ::= {uidOff 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.16
+pemPresent OBJECT IDENTIFIER ::= {bmc 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.16.1
+pem1Present OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   presence(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pem1 Presence
+"
+    ::= {pemPresent 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.16.2
+pem2Present OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   presence(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pem2 Presence
+"
+    ::= {pemPresent 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.16.3
+pem3Present OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   presence(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pem3 Presence
+"
+    ::= {pemPresent 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.16.4
+pem4Present OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   presence(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pem4 Presence
+"
+    ::= {pemPresent 4}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.18
+boardPowerLimit OBJECT IDENTIFIER ::= {bmc 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.18.1
+powerLimitEnable OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   disabled(0),
+                   enabled(1)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Power Limit Enable Flag
+"
+    ::= {boardPowerLimit 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.18.2
+powerLimitValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Power Limit Value(W)
+"
+    ::= {boardPowerLimit 2}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.19
+boardReset OBJECT IDENTIFIER ::= {bmc 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.19.1
+opr OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   restart(1)
+               }
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION 
+        "Restart the device
+"
+    ::= {boardReset 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.20
+boardPowerValue OBJECT IDENTIFIER ::= {bmc 20}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.20.1
+powerValue OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current power value
+"
+    ::= {boardPowerValue 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22
+boardTime OBJECT IDENTIFIER ::= {bmc 22}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.1
+year OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "year
+"
+    ::= {boardTime 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.2
+month OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..12)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "month
+"
+    ::= {boardTime 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.3
+day OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "day
+"
+    ::= {boardTime 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.4
+hour OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "hour
+"
+    ::= {boardTime 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.5
+minute OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "minute
+"
+    ::= {boardTime 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.6
+second OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "second
+"
+    ::= {boardTime 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.7
+timeZone OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "time Zone
+"
+    ::= {boardTime 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.8
+childZone OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "child time Zone
+"
+    ::= {boardTime 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.9
+reserve1 OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "reserve1
+"
+    ::= {boardTime 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.22.10
+reserve2 OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "reserve2
+"
+    ::= {boardTime 10}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.32
+chassisIntrusionState OBJECT IDENTIFIER ::= {bmc 32}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.32.1
+intrusionState OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Chassis intrusion state
+"
+    ::= {chassisIntrusionState 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34
+boardEth1Param OBJECT IDENTIFIER ::= {bmc 34}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.1
+ifDhcpEth1 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DHCP enable flag
+"
+    ::= {boardEth1Param 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.2
+ifVlanEth1 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "VLAN enable flag
+"
+    ::= {boardEth1Param 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.3
+vlanIDEth1 OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID
+"
+    ::= {boardEth1Param 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.4
+iPEth1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "IP Address
+"
+    ::= {boardEth1Param 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.5
+maskEth1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mask
+"
+    ::= {boardEth1Param 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.6
+defaultGWEth1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Default Gateway
+"
+    ::= {boardEth1Param 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.7
+macAddrEth1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC Address
+"
+    ::= {boardEth1Param 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.8
+netEnableFlagEth1 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NetEnable Flag
+"
+    ::= {boardEth1Param 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.9
+lldpEnableEth1 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   true(1),
+                   false(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Eth1 lldp enabled status
+"
+    ::= {boardEth1Param 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.34.10
+workModeEth1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Eth1 working mode
+"
+    ::= {boardEth1Param 10}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35
+boardEth0Param OBJECT IDENTIFIER ::= {bmc 35}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.1
+ifDhcpEth0 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DHCP enable flag
+"
+    ::= {boardEth0Param 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.2
+ifVlanEth0 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "VLAN enable flag
+"
+    ::= {boardEth0Param 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.3
+vlanIDEth0 OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID
+"
+    ::= {boardEth0Param 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.4
+iPEth0 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "IP Address
+"
+    ::= {boardEth0Param 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.5
+maskEth0 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mask
+"
+    ::= {boardEth0Param 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.6
+defaultGWEth0 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Default Gateway
+"
+    ::= {boardEth0Param 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.7
+macAddrEth0 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..18))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC Address
+"
+    ::= {boardEth0Param 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.35.8
+netEnableFlagEth0 OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   enabled(1),
+                   disabled(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NetEnable Flag
+"
+    ::= {boardEth0Param 8}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.43
+boardHostName OBJECT IDENTIFIER ::= {bmc 43}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.43.1
+hostName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The length of the string is not more than 63 characters and not less
+          than 1 character, and can contain letters, Numbers, and '-', but, '-'
+          can not be the first or the last char."
+    ::= {boardHostName 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44
+boardNtpInfo OBJECT IDENTIFIER ::= {bmc 44}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.1
+bmcTimeSource OBJECT-TYPE
+    SYNTAX      Integer32 {
+                   fromNTP(1),
+                   fromBIOS(0),
+                   fromDHCPv4(3),
+                   fromDHCPv6(4)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "bmc time source
+"
+    ::= {boardNtpInfo 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.2
+primaryNtpAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "primary server ip
+"
+    ::= {boardNtpInfo 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.3
+secondaryNtpAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "secondary server ip
+"
+    ::= {boardNtpInfo 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.4
+ntpInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "interval must more than 59s
+"
+    ::= {boardNtpInfo 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.5
+biosIsUTC OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   local(0),
+                   utc(1)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "bios time is UTC or Local
+"
+    ::= {boardNtpInfo 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.44.6
+tertiaryNtpAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "tertiary server ip
+"
+    ::= {boardNtpInfo 6}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.45
+uid1Hz OBJECT IDENTIFIER ::= {bmc 45}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.45.1
+setUid1Hz OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   light1Hz(1)
+               }
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION 
+        "set UID blinking in 1Hz
+"
+    ::= {uid1Hz 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.46
+boardAssetTagInfo OBJECT IDENTIFIER ::= {bmc 46}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.46.1
+boardAssetTag OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (2..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "asset Tag
+"
+    ::= {boardAssetTagInfo 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.47
+coolingModePolicy OBJECT IDENTIFIER ::= {bmc 47}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.47.1
+coolingMode OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normalMode(0),
+                   highPerformanceMode(1),
+                   lowNoiseMode(2)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "cooling mode of fan controller
+"
+    ::= {coolingModePolicy 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.54
+powerSupplyRedundancyPolicy OBJECT IDENTIFIER ::= {bmc 54}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.54.1
+redundancyPolicyStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   redundancylost(0),
+                   redundancyexist(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Power redundancy policy status
+"
+    ::= {powerSupplyRedundancyPolicy 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.55
+pcieSlotCount OBJECT IDENTIFIER ::= {bmc 55}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.55.1
+totalPcieSlotCount OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIE slot Number
+"
+    ::= {pcieSlotCount 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.55.2
+maxPcieSlotCount OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIE slot max Number
+"
+    ::= {pcieSlotCount 2}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.57
+cupsInfo OBJECT IDENTIFIER ::= {bmc 57}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.57.1
+cpuCupsUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "cpu cups utilization
+"
+    ::= {cupsInfo 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.57.2
+memCupsUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "memory cups utilization
+"
+    ::= {cupsInfo 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.57.3
+ioCupsUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "io cups utilization
+"
+    ::= {cupsInfo 3}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.58
+boardGuidInfo OBJECT IDENTIFIER ::= {bmc 58}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.58.1
+guidInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (2..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "guid Info
+"
+    ::= {boardGuidInfo 1}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.59
+systemInfo OBJECT IDENTIFIER ::= {bmc 59}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.59.1
+deviceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "System device name
+"
+    ::= {systemInfo 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.59.2
+deviceSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "System device serial number
+"
+    ::= {systemInfo 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.59.3
+systemHealth OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   minorProblem(1),
+                   majorProblem(2),
+                   criticalProblem(3),
+                   na(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "System health status
+"
+    ::= {systemInfo 3}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.61
+boardPowerMode OBJECT IDENTIFIER ::= {bmc 61}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.61.1
+activeStandby OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   balance(0),
+                   backup(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "psu mode.
+         psu mode get:
+            1: balance(0)
+            2: backup(1)
+            3: na(255) 
+         psu mode set:
+            1: balance(0)"
+    ::= {boardPowerMode 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.61.2
+expectedActivePSU OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "psu coldbackup status
+"
+    ::= {boardPowerMode 2}
+
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1
+boardAssetTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardAssetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing the asset information"
+    ::= {bmc 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1
+boardAssetEntry OBJECT-TYPE
+    SYNTAX          BoardAssetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardAssetTable."
+    INDEX { 
+            fruId
+          }
+    ::= {boardAssetTable 1}
+BoardAssetEntry ::= 
+    SEQUENCE { 
+        fruId                   Unsigned32, 
+        pad                     DisplayString, 
+        boardProduct            DisplayString, 
+        productName             DisplayString, 
+        productMfg              DisplayString, 
+        boardSerial             DisplayString, 
+        productMfgDate          DisplayString, 
+        fruAlarmStatus          Unsigned32, 
+        assetTag                DisplayString, 
+        productPartModel        DisplayString, 
+        productSerial           DisplayString, 
+        productVersion          DisplayString, 
+        boardExtra              DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.1
+fruId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FRU No
+"
+    ::= {boardAssetEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.2
+pad OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pad
+"
+    ::= {boardAssetEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.3
+boardProduct OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FRU name
+"
+    ::= {boardAssetEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.4
+productName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Board name
+"
+    ::= {boardAssetEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.5
+productMfg OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Manufacture name
+"
+    ::= {boardAssetEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.6
+boardSerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Serial number
+"
+    ::= {boardAssetEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.7
+productMfgDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Manufacture date
+"
+    ::= {boardAssetEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.8
+fruAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   criticalAlarm(1),
+                   majorAlarm(2),
+                   minorAlarm(3),
+                   na(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FRU alarm status
+"
+    ::= {boardAssetEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.9
+assetTag OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Asset Tag
+"
+    ::= {boardAssetEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.10
+productPartModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product Part/Model Number
+"
+    ::= {boardAssetEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.11
+productSerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product serial
+"
+    ::= {boardAssetEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.12
+productVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product version
+"
+    ::= {boardAssetEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.1.1.13
+boardExtra OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Board addition info
+"
+    ::= {boardAssetEntry 13}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7
+boardVersionTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardVersionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing the version information"
+    ::= {bmc 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1
+boardVersionEntry OBJECT-TYPE
+    SYNTAX          BoardVersionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardVersionTable."
+    INDEX { 
+            verType,
+            verAttu,
+            locate
+          }
+    ::= {boardVersionTable 1}
+BoardVersionEntry ::= 
+    SEQUENCE { 
+        res                     Unsigned32, 
+        verNum                  DisplayString, 
+        verType                 Unsigned32, 
+        verAttu                 Unsigned32, 
+        locate                  Unsigned32, 
+        name                    DisplayString, 
+        auxiliary               DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.1
+res OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Defines the index of board version table.
+         The value of 0 represents available, and other values represent
+          unavailable."
+    ::= {boardVersionEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.2
+verNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Version No
+"
+    ::= {boardVersionEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.3
+verType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   oem(5),
+                   epld(7),
+                   bootrom(8),
+                   bmc(14),
+                   fru(15),
+                   bmcBoot(20),
+                   bios(26),
+                   vdisk(33),
+                   biosCfg(36)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Version Type
+"
+    ::= {boardVersionEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.4
+verAttu OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Defines the Version Attribute of board version table.
+            If dwVerType is BIOS,
+         the value of 0 represents the Backup Version No;
+         the value of 1 represents the Running Version No;
+         the value of 0xFFFFFFFF represents Unburned Version No.
+           Others:
+           Version Attribute is firmware index in the same main board/Sub-card,
+          1-based"
+    ::= {boardVersionEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.5
+locate OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of 0 represents the main board, and other values represent
+          Subcard
+         ."
+    ::= {boardVersionEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.6
+name OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Name
+"
+    ::= {boardVersionEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.7.1.7
+auxiliary OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Version auxiliary information
+"
+    ::= {boardVersionEntry 7}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8
+boardcpuTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardcpuEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing the CPU information"
+    ::= {bmc 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1
+boardcpuEntry OBJECT-TYPE
+    SYNTAX          BoardcpuEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardcpuTable."
+    INDEX { 
+            cpuIndex
+          }
+    ::= {boardcpuTable 1}
+BoardcpuEntry ::= 
+    SEQUENCE { 
+        cpuIndex                Unsigned32, 
+        cpuType                 DisplayString, 
+        cpuFamilyType           DisplayString, 
+        cpuMan                  DisplayString, 
+        cpuTFrequency           Unsigned32, 
+        cpuMaxSpeed             Unsigned32, 
+        cpuState                DisplayString, 
+        cpuCoreNum              Unsigned32, 
+        cpuEnabledCoreNum       Unsigned32, 
+        cpuThreadNum            Unsigned32, 
+        cpuTdp                  Unsigned32, 
+        cpuL1Cache              Unsigned32, 
+        cpuL2Cache              Unsigned32, 
+        cpuL3Cache              Unsigned32, 
+        cpuSpeed                Unsigned32, 
+        cpuProcessorArch        DisplayString, 
+        cpuSerialNum            DisplayString, 
+        cpuPartNum              DisplayString, 
+        cpuAlarmStatus          Unsigned32, 
+        cpuInstructionSet       DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.1
+cpuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Index
+"
+    ::= {boardcpuEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.2
+cpuType OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Type
+"
+    ::= {boardcpuEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.3
+cpuFamilyType OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Family Type
+"
+    ::= {boardcpuEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.4
+cpuMan OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Manufacture
+"
+    ::= {boardcpuEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.5
+cpuTFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Frequency(MHZ)
+"
+    ::= {boardcpuEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.6
+cpuMaxSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Max Speed(MHZ)
+"
+    ::= {boardcpuEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.7
+cpuState OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU State
+"
+    ::= {boardcpuEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.8
+cpuCoreNum OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Core Number
+"
+    ::= {boardcpuEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.9
+cpuEnabledCoreNum OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Enabled Core Number
+"
+    ::= {boardcpuEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.10
+cpuThreadNum OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Thread Number
+"
+    ::= {boardcpuEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.11
+cpuTdp OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU TDP Power(W)
+"
+    ::= {boardcpuEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.12
+cpuL1Cache OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU L1 Cache(KB)
+"
+    ::= {boardcpuEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.13
+cpuL2Cache OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU L2 Cache(KB)
+"
+    ::= {boardcpuEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.14
+cpuL3Cache OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU L3 Cache(KB)
+"
+    ::= {boardcpuEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.15
+cpuSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Speed(MHZ)
+"
+    ::= {boardcpuEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.16
+cpuProcessorArch OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Processor Architecture
+"
+    ::= {boardcpuEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.17
+cpuSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Serial Number
+"
+    ::= {boardcpuEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.18
+cpuPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Part Number
+"
+    ::= {boardcpuEntry 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.19
+cpuAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   minor(1),
+                   major(2),
+                   critical(3),
+                   unkown(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Alarm Status
+"
+    ::= {boardcpuEntry 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.8.1.20
+cpuInstructionSet OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU InstructionSet
+"
+    ::= {boardcpuEntry 20}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14
+boardSensorTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardSensorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing the sensor information"
+    ::= {bmc 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1
+boardSensorEntry OBJECT-TYPE
+    SYNTAX          BoardSensorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardSensorTable."
+    INDEX { 
+            snrNo,
+            fruNo
+          }
+    ::= {boardSensorTable 1}
+BoardSensorEntry ::= 
+    SEQUENCE { 
+        snrNo                   Unsigned32, 
+        fruNo                   Unsigned32, 
+        snrName                 DisplayString, 
+        fruSensorCurrent        DisplayString, 
+        fruSensorUpperCritical    DisplayString, 
+        fruSensorUpperNonCritical    DisplayString, 
+        fruSensorUpperNonRecoverable    DisplayString, 
+        fruSensorLowerCritical    DisplayString, 
+        fruSensorLowerNonCritical    DisplayString, 
+        fruSensorLowerNonRecoverable    DisplayString, 
+        healthStatus            Unsigned32, 
+        snrType                 Unsigned32, 
+        snrUnit                 Unsigned32, 
+        eventType               Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.1
+snrNo OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor No
+"
+    ::= {boardSensorEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.2
+fruNo OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fru No
+"
+    ::= {boardSensorEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.3
+snrName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Name
+"
+    ::= {boardSensorEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.4
+fruSensorCurrent OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Current
+"
+    ::= {boardSensorEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.5
+fruSensorUpperCritical OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Upper Critical
+"
+    ::= {boardSensorEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.6
+fruSensorUpperNonCritical OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Upper Non-critical
+"
+    ::= {boardSensorEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.7
+fruSensorUpperNonRecoverable OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Upper Non-recoverable
+"
+    ::= {boardSensorEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.8
+fruSensorLowerCritical OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Lower Critical
+"
+    ::= {boardSensorEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.9
+fruSensorLowerNonCritical OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Lower Non-critical
+"
+    ::= {boardSensorEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.10
+fruSensorLowerNonRecoverable OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Lower Non-recoverable
+"
+    ::= {boardSensorEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.11
+healthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   minorAlarm(1),
+                   majorAlarm(2),
+                   criticalAlarm(3),
+                   na(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Health
+"
+    ::= {boardSensorEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.12
+snrType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   temperature(1),
+                   voltage(2),
+                   current(3),
+                   fan(4),
+                   physicalSecurity(5),
+                   platSecurityViolationAttempt(6),
+                   processor(7),
+                   powerSupply(8),
+                   powerUnit(9),
+                   coolingDevice(10),
+                   otherUnitsBasedSensor(11),
+                   memory(12),
+                   driverSlot(13),
+                   postMemoryResize(14),
+                   systemFirmwareProgress(15),
+                   eventLoggingDisabled(16),
+                   watchdog1(17),
+                   systemEvent(18),
+                   criticalInterrupt(19),
+                   buttonSwitch(20),
+                   moduleBoard(21),
+                   microcontrollerCoprocessor(22),
+                   subCard(23),
+                   chassis(24),
+                   chipSet(25),
+                   otherFru(26),
+                   cableInterconnect(27),
+                   terminator(28),
+                   systemBootInitiated(29),
+                   bootError(30),
+                   osBoot(31),
+                   osCriticalStop(32),
+                   slotConnector(33),
+                   systemAcpiPowerState(34),
+                   watchdog2(35),
+                   platformAlert(36),
+                   entityPresence(37),
+                   monitorAsicIc(38),
+                   lan(39),
+                   managementSubsystemHealth(40),
+                   battery(41),
+                   sessionAudit(42),
+                   versionChange(43),
+                   fruState(44),
+                   smiTimeout(192),
+                   selfTest(193),
+                   hostEvent(194),
+                   biosStartup(195),
+                   sensorSelfEvent(196),
+                   pemVoltageFalling(197),
+                   boardPoweronFailure(198),
+                   hotSwapState(240),
+                   ipmbLinkStatus(241)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Type
+"
+    ::= {boardSensorEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.13
+snrUnit OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unspecified(0),
+                   degreesC(1),
+                   degreesF(2),
+                   degreesK(3),
+                   volts(4),
+                   amps(5),
+                   watts(6),
+                   joules(7),
+                   coulombs(8),
+                   va(9),
+                   nits(10),
+                   lumen(11),
+                   lux(12),
+                   candela(13),
+                   kPa(14),
+                   psi(15),
+                   newton(16),
+                   cfm(17),
+                   rpm(18),
+                   hz(19),
+                   microsecond(20),
+                   millisecond(21),
+                   second(22),
+                   minute(23),
+                   hour(24),
+                   day(25),
+                   week(26),
+                   mil(27),
+                   inches(28),
+                   feet(29),
+                   cuIn(30),
+                   cuFeet(31),
+                   mm(32),
+                   cm(33),
+                   m(34),
+                   cuCm(35),
+                   cuM(36),
+                   liters(37),
+                   fluidOunce(38),
+                   radians(39),
+                   steradians(40),
+                   revolutions(41),
+                   cycles(42),
+                   gravities(43),
+                   ounce(44),
+                   pound(45),
+                   ftlb(46),
+                   ozIn(47),
+                   gauss(48),
+                   gilberts(49),
+                   henry(50),
+                   millihenry(51),
+                   farad(52),
+                   microfarad(53),
+                   ohms(54),
+                   siemens(55),
+                   mole(56),
+                   becquerel(57),
+                   ppm(58),
+                   reserved(59),
+                   decibels(60),
+                   dbA(61),
+                   dbC(62),
+                   gray(63),
+                   sievert(64),
+                   colortempdegK(65),
+                   bit(66),
+                   kilobit(67),
+                   megabit(68),
+                   gigabit(69),
+                   byte(70),
+                   kilobyte(71),
+                   megabyte(72),
+                   gigabyte(73),
+                   word(74),
+                   dword(75),
+                   qword(76),
+                   line(77),
+                   hit(78),
+                   miss(79),
+                   retry(80),
+                   reset(81),
+                   overrunOverflow(82),
+                   underrun(83),
+                   collision(84),
+                   packets(85),
+                   messages(86),
+                   characters(87),
+                   error(88),
+                   correctableError(89),
+                   uncorrectableError(90),
+                   percent(254)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Sensor Unit
+"
+    ::= {boardSensorEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.14.1.14
+eventType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unspecified(0),
+                   threshold(1),
+                   genericDiscrete1(2),
+                   genericDiscrete2(3),
+                   genericDiscrete3(4),
+                   genericDiscrete4(5),
+                   genericDiscrete5(6),
+                   genericDiscrete6(7),
+                   genericDiscrete7(8),
+                   genericDiscrete8(9),
+                   genericDiscrete9(10),
+                   genericDiscrete10(11),
+                   genericDiscrete11(12),
+                   sensorSpecific(111),
+                   oem1(112),
+                   oem2(113),
+                   oem3(114),
+                   oem4(115),
+                   oem5(116),
+                   oem6(117),
+                   oem7(118),
+                   oem8(119),
+                   oem9(120),
+                   oem10(121),
+                   oem11(122),
+                   oem12(123),
+                   oem13(124),
+                   oem14(125),
+                   oem15(126),
+                   oem16(127)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Event Type
+         The value of 0 represents             unspecified;
+         The value of 1 represents             threshold;
+         The range value 2-12 represent Generic;
+         The value of 111 represents Sensor specific;
+         The range value 112-127 represent OEM"
+    ::= {boardSensorEntry 14}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21
+boardFanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardFanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "Server Fan Information"
+    ::= {bmc 21}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1
+boardFanEntry OBJECT-TYPE
+    SYNTAX          BoardFanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardFanTable."
+    INDEX { 
+            fanIndex
+          }
+    ::= {boardFanTable 1}
+BoardFanEntry ::= 
+    SEQUENCE { 
+        fanIndex                Unsigned32, 
+        fanOnline               Unsigned32, 
+        fanSpeed                Unsigned32, 
+        fanPwmRatio             Unsigned32, 
+        fanMinRpm               Unsigned32, 
+        fanMaxRpm               Unsigned32, 
+        fanHealthSt             Unsigned32, 
+        fanSeriNum              DisplayString, 
+        fanPartNum              DisplayString, 
+        fanIdentify             DisplayString, 
+        fanAlarmStatus          Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.1
+fanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Index
+"
+    ::= {boardFanEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.2
+fanOnline OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   present(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Presence Status
+"
+    ::= {boardFanEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.3
+fanSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(4294967295)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Speed(RPM)
+"
+    ::= {boardFanEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.4
+fanPwmRatio OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PWM Ratio(%)
+"
+    ::= {boardFanEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.5
+fanMinRpm OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Min Speed(RPM)
+"
+    ::= {boardFanEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.6
+fanMaxRpm OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Max Speed(RPM)
+"
+    ::= {boardFanEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.7
+fanHealthSt OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unHealthy(0),
+                   healthy(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Health Status
+"
+    ::= {boardFanEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.8
+fanSeriNum OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Serial Number
+"
+    ::= {boardFanEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.9
+fanPartNum OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Part Number
+"
+    ::= {boardFanEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.10
+fanIdentify OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Identify
+"
+    ::= {boardFanEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.21.1.11
+fanAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   minor(1),
+                   major(2),
+                   critical(3),
+                   unkown(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Fan Alarm Status
+"
+    ::= {boardFanEntry 11}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24
+memoryInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MemoryInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the memory information"
+    ::= {bmc 24}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1
+memoryInfoEntry OBJECT-TYPE
+    SYNTAX          MemoryInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the memoryInfoTable."
+    INDEX { 
+            memCardNum,
+            memSilkNum
+          }
+    ::= {memoryInfoTable 1}
+MemoryInfoEntry ::= 
+    SEQUENCE { 
+        memCardNum              Unsigned32, 
+        memSilkNum              DisplayString, 
+        memIndex                Unsigned32, 
+        memCapacity             Unsigned32, 
+        memEncapMethod          DisplayString, 
+        eccType                 DisplayString, 
+        isLowVol                DisplayString, 
+        bModuleType             DisplayString, 
+        memNum                  Unsigned32, 
+        memType                 DisplayString, 
+        memFrequency            Unsigned32, 
+        memMan                  DisplayString, 
+        memSerial               DisplayString, 
+        memRegisterNum          DisplayString, 
+        memAlarmStatus          Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.1
+memCardNum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory card index
+"
+    ::= {memoryInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.2
+memSilkNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Silk Number
+"
+    ::= {memoryInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.3
+memIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory index
+"
+    ::= {memoryInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.4
+memCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory capacity
+"
+    ::= {memoryInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.5
+memEncapMethod OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory encap method
+"
+    ::= {memoryInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.6
+eccType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "ECC type
+"
+    ::= {memoryInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.7
+isLowVol OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR voltage(Volts)
+"
+    ::= {memoryInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.8
+bModuleType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DRAM type
+"
+    ::= {memoryInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.9
+memNum OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Support memory number
+"
+    ::= {memoryInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.10
+memType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DIMM type
+"
+    ::= {memoryInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.11
+memFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory frequency(MHz)
+"
+    ::= {memoryInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.12
+memMan OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory Manufacture
+"
+    ::= {memoryInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.13
+memSerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory serial
+"
+    ::= {memoryInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.14
+memRegisterNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory Part Number
+"
+    ::= {memoryInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.24.1.15
+memAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   minor(1),
+                   major(2),
+                   critical(3),
+                   unkown(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Mem Alarm Status
+"
+    ::= {memoryInfoEntry 15}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25
+boardPemTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardPemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the pem information"
+    ::= {bmc 25}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1
+boardPemEntry OBJECT-TYPE
+    SYNTAX          BoardPemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardPemTable."
+    INDEX { 
+            pemIndex
+          }
+    ::= {boardPemTable 1}
+BoardPemEntry ::= 
+    SEQUENCE { 
+        pemIndex                Unsigned32, 
+        pemPowerCapacity        Unsigned32, 
+        pemUpTemperature        Integer32, 
+        pemDownTemperature      Integer32, 
+        pemOutputStatus         Unsigned32, 
+        pemOutputPower          Unsigned32, 
+        pemInputPower           Unsigned32, 
+        pemAlarmStatus          Unsigned32, 
+        pemVoltage              DisplayString, 
+        pemBoardManu            DisplayString, 
+        pemBoardSerNum          DisplayString, 
+        pemBoardManuDate        DisplayString, 
+        pemBoardManuModel       DisplayString, 
+        pemBoardManuRevision    DisplayString, 
+        pemBoardPartNum         DisplayString, 
+        pemSupplyType           DisplayString, 
+        pemCurInputVolts        DisplayString, 
+        pemCurTemperature       Integer32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.1
+pemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Index
+"
+    ::= {boardPemEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.2
+pemPowerCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Power Capacity
+"
+    ::= {boardPemEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.3
+pemUpTemperature OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Upper Temperature
+"
+    ::= {boardPemEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.4
+pemDownTemperature OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Lower Temperature
+"
+    ::= {boardPemEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.5
+pemOutputStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   close(0),
+                   open(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Output status
+"
+    ::= {boardPemEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.6
+pemOutputPower OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Output Power
+"
+    ::= {boardPemEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.7
+pemInputPower OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Input Power
+"
+    ::= {boardPemEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.8
+pemAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   minorProblem(1),
+                   majorProblem(2),
+                   criticalProblem(3),
+                   na(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pem alarm status
+"
+    ::= {boardPemEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.9
+pemVoltage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Voltage
+"
+    ::= {boardPemEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.10
+pemBoardManu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Manufacture
+"
+    ::= {boardPemEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.11
+pemBoardSerNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Serial Number
+"
+    ::= {boardPemEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.12
+pemBoardManuDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Manufacture Date
+"
+    ::= {boardPemEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.13
+pemBoardManuModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Model
+"
+    ::= {boardPemEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.14
+pemBoardManuRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Revision
+"
+    ::= {boardPemEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.15
+pemBoardPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Part Number
+"
+    ::= {boardPemEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.16
+pemSupplyType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Supply Type
+"
+    ::= {boardPemEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.17
+pemCurInputVolts OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Current Input Volts
+"
+    ::= {boardPemEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.25.1.18
+pemCurTemperature OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PEM Current Temperature
+"
+    ::= {boardPemEntry 18}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27
+nicInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NicInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the net card information"
+    ::= {bmc 27}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1
+nicInfoEntry OBJECT-TYPE
+    SYNTAX          NicInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the nicInfoTable."
+    INDEX { 
+            nicIndex
+          }
+    ::= {nicInfoTable 1}
+NicInfoEntry ::= 
+    SEQUENCE { 
+        nicIndex                Unsigned32, 
+        totalPort               Unsigned32, 
+        interfaceType           Unsigned32, 
+        chipProductName         DisplayString, 
+        manuFacture             DisplayString, 
+        cardName                DisplayString, 
+        slotType                Unsigned32, 
+        slot                    Unsigned32, 
+        nicSerialNum            DisplayString, 
+        nicPartNum              DisplayString, 
+        nicFirmwareVersion      DisplayString, 
+        maxTemp                 Unsigned32, 
+        fpgaStatus              Unsigned32, 
+        fpgaTempStatus          Unsigned32, 
+        networkTechnology       DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.1
+nicIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet card index, start from 0
+"
+    ::= {nicInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.2
+totalPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet port number
+"
+    ::= {nicInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.3
+interfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   copper(0),    
+                   fiber(1), 
+                   serdes(2),
+                   copper-fiber(3),
+                   fiber-serdes(5), 
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet card type
+"
+    ::= {nicInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.4
+chipProductName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet card model
+"
+    ::= {nicInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.5
+manuFacture OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's manufacture name
+"
+    ::= {nicInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.6
+cardName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's card name
+"
+    ::= {nicInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.7
+slotType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   embedded(0),
+                   pcie(1),
+                   ocp(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's slot type
+"
+    ::= {nicInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.8
+slot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's slot num, starts with 1
+"
+    ::= {nicInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.9
+nicSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's serial number
+"
+    ::= {nicInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.10
+nicPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's part number
+"
+    ::= {nicInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.11
+nicFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "NIC's Firmware version
+"
+    ::= {nicInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.12
+maxTemp OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FPGA's maximum temperature
+"
+    ::= {nicInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.13
+fpgaStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normal(0),
+                   abnormal(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FPGA's work status
+"
+    ::= {nicInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.14
+fpgaTempStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normal(0),
+                   abnormal(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FPGA's temperature status
+"
+    ::= {nicInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.27.1.15
+networkTechnology OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Network technology
+"
+    ::= {nicInfoEntry 15}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28
+nicMemoryInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NicMemoryInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing net card memory information"
+    ::= {bmc 28}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1
+nicMemoryInfoEntry OBJECT-TYPE
+    SYNTAX          NicMemoryInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the nicMemoryInfoTable."
+    INDEX { 
+            nicCardIndex,
+            ddrId
+          }
+    ::= {nicMemoryInfoTable 1}
+NicMemoryInfoEntry ::= 
+    SEQUENCE { 
+        nicCardIndex            Unsigned32, 
+        ddrId                   Unsigned32, 
+        ddrType                 Unsigned32, 
+        ddrModel                Unsigned32, 
+        ddrCap                  Unsigned32, 
+        ddrStatus               Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.1
+nicCardIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet card index, start from 0
+"
+    ::= {nicMemoryInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.2
+ddrId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR memory index
+"
+    ::= {nicMemoryInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.3
+ddrType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   qdr(1),
+                   ddr(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR Type
+"
+    ::= {nicMemoryInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.4
+ddrModel OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   qdr4-2000mhz(1),
+                   ddr4-2400mhz(2),
+                   ddr4-2000mhz(3),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR Model
+"
+    ::= {nicMemoryInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.5
+ddrCap OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(4294967295)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR Capacity(Mb)
+"
+    ::= {nicMemoryInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.28.1.6
+ddrStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normal(0),
+                   abnormal(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DDR Status
+"
+    ::= {nicMemoryInfoEntry 6}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30
+boardCpuTempTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardCpuTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing CPU temperature information"
+    ::= {bmc 30}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30.1
+boardCpuTempEntry OBJECT-TYPE
+    SYNTAX          BoardCpuTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardCpuTempTable."
+    INDEX { 
+            boardcpuIndex
+          }
+    ::= {boardCpuTempTable 1}
+BoardCpuTempEntry ::= 
+    SEQUENCE { 
+        boardcpuIndex           Unsigned32, 
+        cpuPresent              Unsigned32, 
+        cpuTemp                 Unsigned32, 
+        tempValid               Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30.1.1
+boardcpuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Index
+"
+    ::= {boardCpuTempEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30.1.2
+cpuPresent OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   present(1),
+                   absent(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU present info: 1 -- present, 0 -- absent, 255 -- na.
+"
+    ::= {boardCpuTempEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30.1.3
+cpuTemp OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU temperature information
+"
+    ::= {boardCpuTempEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.30.1.4
+tempValid OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   available(1),
+                   unavailable(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU temperature validity: 1 -- available, 0 -- not available.
+"
+    ::= {boardCpuTempEntry 4}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31
+boardDimmTempTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardDimmTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing memory temperature information"
+    ::= {bmc 31}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1
+boardDimmTempEntry OBJECT-TYPE
+    SYNTAX          BoardDimmTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardDimmTempTable."
+    INDEX { 
+            dimmIndex
+          }
+    ::= {boardDimmTempTable 1}
+BoardDimmTempEntry ::= 
+    SEQUENCE { 
+        dimmIndex               Unsigned32, 
+        dimmPresent             Unsigned32, 
+        dimmTemp                Unsigned32, 
+        infoValid               Unsigned32, 
+        dimmSilk                DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1.1
+dimmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "dimm Index: start from 1
+"
+    ::= {boardDimmTempEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1.2
+dimmPresent OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   present(1),
+                   absent(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "dimm present info: 1 -- present, 0 -- absent, 255 -- na.
+"
+    ::= {boardDimmTempEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1.3
+dimmTemp OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "dimm temperature information
+"
+    ::= {boardDimmTempEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1.4
+infoValid OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   available(1),
+                   unavailable(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "dimm temperature validity: 1 -- available, 0 -- not available.
+"
+    ::= {boardDimmTempEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.31.1.5
+dimmSilk OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "dimm silk
+"
+    ::= {boardDimmTempEntry 5}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33
+chassisTempTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ChassisTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "Chassis Temperature Information"
+    ::= {bmc 33}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33.1
+chassisTempEntry OBJECT-TYPE
+    SYNTAX          ChassisTempEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the chassisTempTable."
+    INDEX { 
+            ioletIndex
+          }
+    ::= {chassisTempTable 1}
+ChassisTempEntry ::= 
+    SEQUENCE { 
+        ioletIndex              Unsigned32, 
+        ioletType               Unsigned32, 
+        ioletTemp               Unsigned32, 
+        ioletVaild              Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33.1.1
+ioletIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "iolet index
+"
+    ::= {chassisTempEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33.1.2
+ioletType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   inletTemperature(0),
+                   outletTemperature(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "iolet  type
+"
+    ::= {chassisTempEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33.1.3
+ioletTemp OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "iolet temperature
+"
+    ::= {chassisTempEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.33.1.4
+ioletVaild OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unavailable(0),
+                   available(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Iolet temp vaildity
+"
+    ::= {chassisTempEntry 4}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36
+ctrlInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CtrlInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the storage controller card information"
+    ::= {bmc 36}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1
+ctrlInfoEntry OBJECT-TYPE
+    SYNTAX          CtrlInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the ctrlInfoTable."
+    INDEX { 
+            ctrlIndex
+          }
+    ::= {ctrlInfoTable 1}
+CtrlInfoEntry ::= 
+    SEQUENCE { 
+        ctrlIndex               Unsigned32, 
+        ctrlTemperature         Unsigned32, 
+        ctrlCacheSize           Unsigned32, 
+        ctrlFwVer               DisplayString, 
+        ctrlDevType             DisplayString, 
+        ctrlOpRomVer            DisplayString, 
+        ctrlStatus              Unsigned32, 
+        bbuPresentStatus        Unsigned32, 
+        bbuTemperature          Unsigned32, 
+        bbuVoltageInfo          Unsigned32, 
+        locationSlotType        Unsigned32, 
+        locationSlotNum         Unsigned32, 
+        bConnectExpander        Unsigned32, 
+        expanderVersion         DisplayString, 
+        expander2Version        DisplayString, 
+        ucVendor                DisplayString, 
+        ucChipModel             DisplayString, 
+        ucChipVendor            DisplayString, 
+        ucSerialNum             DisplayString, 
+        ucPartNum               DisplayString, 
+        bbuHealth               Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.1
+ctrlIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Storage controller index,start from 0
+"
+    ::= {ctrlInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.2
+ctrlTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller temperature
+"
+    ::= {ctrlInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.3
+ctrlCacheSize OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller cache size(MB)
+"
+    ::= {ctrlInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.4
+ctrlFwVer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller firmware version
+"
+    ::= {ctrlInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.5
+ctrlDevType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller dev type
+"
+    ::= {ctrlInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.6
+ctrlOpRomVer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller OP ROM version
+"
+    ::= {ctrlInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.7
+ctrlStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   unhealthy(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller status
+"
+    ::= {ctrlInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.8
+bbuPresentStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   absent(0),
+                   present(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller BBU is present
+"
+    ::= {ctrlInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.9
+bbuTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normal(255),
+                   high(254),
+                   invalid(253)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller BBU temperature
+"
+    ::= {ctrlInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.10
+bbuVoltageInfo OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   normal(255),
+                   low(254),
+                   invalid(253)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller BBU voltage
+"
+    ::= {ctrlInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.11
+locationSlotType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   embedded(0),
+                   pcie(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller location type
+"
+    ::= {ctrlInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.12
+locationSlotNum OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..12)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller location slot
+"
+    ::= {ctrlInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.13
+bConnectExpander OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   no(0),
+                   yes(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Expander is connected
+"
+    ::= {ctrlInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.14
+expanderVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Expander1 version
+"
+    ::= {ctrlInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.15
+expander2Version OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Expander2 version
+"
+    ::= {ctrlInfoEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.16
+ucVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller vendor
+"
+    ::= {ctrlInfoEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.17
+ucChipModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller chip model
+"
+    ::= {ctrlInfoEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.18
+ucChipVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller chip vendor
+"
+    ::= {ctrlInfoEntry 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.19
+ucSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller serial number
+"
+    ::= {ctrlInfoEntry 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.20
+ucPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller part number
+"
+    ::= {ctrlInfoEntry 20}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.36.1.21
+bbuHealth OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   minorAlarm(1),
+                   majorAlarm(2),
+                   riticalAlarm(3),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "controller BBUhealth
+"
+    ::= {ctrlInfoEntry 21}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37
+pdInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PdInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the physical disks information"
+    ::= {bmc 37}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1
+pdInfoEntry OBJECT-TYPE
+    SYNTAX          PdInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the pdInfoTable."
+    INDEX { 
+            pdSlot
+          }
+    ::= {pdInfoTable 1}
+PdInfoEntry ::= 
+    SEQUENCE { 
+        pdControllerIndex       Unsigned32, 
+        pdSlot                  Unsigned32, 
+        pdNegoLinkSpeed         Unsigned32, 
+        pdMediaType             Unsigned32, 
+        pdRotateRate            Unsigned32, 
+        pdTemperature           Unsigned32, 
+        pdStatusInController    Unsigned32, 
+        pdHealth                Unsigned32, 
+        pdModelInfo             DisplayString, 
+        pdVendorInfo            DisplayString, 
+        pdSerialNumber          DisplayString, 
+        pdFirmwareVersion       DisplayString, 
+        pdAPortSasAddress       DisplayString, 
+        pdInterfaceType         Unsigned32, 
+        pdDiskSize              Unsigned32, 
+        pdRawCapacity           Unsigned32, 
+        pdLifeUsed              Unsigned32, 
+        pdSlotInCtrl            Unsigned32, 
+        pdPartNum               DisplayString, 
+        pdCapableSpeedGbs       Unsigned32, 
+        pdLocationInfo          DisplayString, 
+        pdDiskLocater           DisplayString, 
+        pdLifeRemained          Unsigned32, 
+        pdMediaErrCount         Unsigned32, 
+        pdOtherErrCount         Unsigned32, 
+        pdPrefailErrCount       Unsigned32, 
+        pdRawCapacityBytes      DisplayString, 
+        pdStatusIsForeign       Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.1
+pdControllerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Index of controller that containing this physical disk.
+"
+    ::= {pdInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.2
+pdSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(16711935)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk slot number(the high 16 bits are stand for zone, the low 16 bits
+          are stand for slik)"
+    ::= {pdInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.3
+pdNegoLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed3G(0),
+                   speed6G(1),
+                   speed12G(2),
+                   speed1p5G(3),
+                   speed8G(5),
+                   speed16G(6),
+                   speed32G(7),
+                   speed24G(8),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk link speed
+         (speed1p5G:speed1.5G)"
+    ::= {pdInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.4
+pdMediaType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   hdd(0),
+                   ssd(1),
+                   ssmFlash(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk media type
+"
+    ::= {pdInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.5
+pdRotateRate OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed5400RPM(0),
+                   speed7200RPM(1),
+                   speed10000RPM(2),
+                   speed10025RPM(3),
+                   speed15000RPM(4),
+                   ssd(5),
+                   speed10500RPM(6),
+                   speed10520RPM(7),
+                   speed15030RPM(8),
+                   speed15052RPM(9),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk rotate rate
+"
+    ::= {pdInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.6
+pdTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk temperature
+"
+    ::= {pdInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.7
+pdStatusInController OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unconfiguredGood(0),
+                   unconfiguredBad(1),
+                   online(2),
+                   rebuilding(3),
+                   offline(4),
+                   globalHSP(5),
+                   failed(6),
+                   raw(7),
+                   ready(8),
+                   dead(9),
+                   dedicatedHSP(10),
+                   foreign(12),
+                   jbod(13),
+                   configuredShielded(14),
+                   unknown(15),
+                   journal(16),
+                   active(17),
+                   copyBack(18),
+                   failedDueToPSA(19),
+                   unsupportedNoLicense(20),
+                   predictiveFailure(21),
+                   predictiveFailureWornOut(22),
+                   transientDrive(23),
+                   erasingOffline(24),
+                   invalidDriveSize(25),
+                   firmwareUpdateRequired(26),
+                   exposedToOS(27),
+                   maskedWithInvalidCCM(28),
+                   unsupportedForConfig(29),
+                   rebuildQueued(30),
+                   ok(31),
+                   na(11)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk status in controller
+"
+    ::= {pdInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.8
+pdHealth OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   warning(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk health
+"
+    ::= {pdInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.9
+pdModelInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk model information
+"
+    ::= {pdInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.10
+pdVendorInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk vendor information
+"
+    ::= {pdInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.11
+pdSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk serial number
+"
+    ::= {pdInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.12
+pdFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk firmware version
+"
+    ::= {pdInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.13
+pdAPortSasAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk sas address
+"
+    ::= {pdInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.14
+pdInterfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   parallelSCSI(1),
+                   sas(2),
+                   sata(3),
+                   fc(4),
+                   pcie(5),
+                   nvme(6)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk interface type
+"
+    ::= {pdInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.15
+pdDiskSize OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   size2p5(0),
+                   size3p5(1),
+                   size80x22x3p5(2),
+                   size22x110(3),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk size
+"
+    ::= {pdInfoEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.16
+pdRawCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk raw capacity(GB).
+"
+    ::= {pdInfoEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.17
+pdLifeUsed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk life used.0xff means not support.
+"
+    ::= {pdInfoEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.18
+pdSlotInCtrl OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk slot in controller
+"
+    ::= {pdInfoEntry 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.19
+pdPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Part number
+"
+    ::= {pdInfoEntry 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.20
+pdCapableSpeedGbs OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   speed-3(2),
+                   speed-6(3),
+                   speed-12(4),
+                   speed-8(5),
+                   speed-16(6),
+                   speed-32(7),
+                   speed-24(8)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk capable speed
+"
+    ::= {pdInfoEntry 20}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.21
+pdLocationInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Location
+"
+    ::= {pdInfoEntry 21}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.22
+pdDiskLocater OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Locater
+"
+    ::= {pdInfoEntry 22}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.23
+pdLifeRemained OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk life remained,0xff means not support.
+"
+    ::= {pdInfoEntry 23}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.24
+pdMediaErrCount OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(65535)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Media error count.
+"
+    ::= {pdInfoEntry 24}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.25
+pdOtherErrCount OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(65535)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Other error count.
+"
+    ::= {pdInfoEntry 25}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.26
+pdPrefailErrCount OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(65535)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk Prefail error count.
+"
+    ::= {pdInfoEntry 26}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.27
+pdRawCapacityBytes OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk raw capacity(Bytes).
+"
+    ::= {pdInfoEntry 27}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.37.1.28
+pdStatusIsForeign OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   true(1), 
+                   false(0), 
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk foreign status
+"
+    ::= {pdInfoEntry 28}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38
+ldInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF LdInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the logical disks information"
+    ::= {bmc 38}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1
+ldInfoEntry OBJECT-TYPE
+    SYNTAX          LdInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the ldInfoTable."
+    INDEX { 
+            ldControllerIndex,
+            virtualDriveIndex
+          }
+    ::= {ldInfoTable 1}
+LdInfoEntry ::= 
+    SEQUENCE { 
+        ldControllerIndex       Unsigned32, 
+        virtualDriveIndex       Unsigned32, 
+        raidLevel               Unsigned32, 
+        memDiskNum              Unsigned32, 
+        ldState                 Unsigned32, 
+        rebuildProgInfo         Unsigned32, 
+        ldIOPolicy              Unsigned32, 
+        ldPad                   Unsigned32, 
+        ldAccessPolicy          Unsigned32, 
+        ldDiskCachePolicy       Unsigned32, 
+        ldReadAheadPolicy       Unsigned32, 
+        ldWritePolicy           Unsigned32, 
+        ldMemDiskSlot           Unsigned32, 
+        ldStripeSize            Unsigned32, 
+        ldCapacity              Unsigned32, 
+        virtualDriveName        DisplayString, 
+        vdIndexInCtrl           Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.1
+ldControllerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Index of controller that containing this logical disk.
+"
+    ::= {ldInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.2
+virtualDriveIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "logical disk index
+"
+    ::= {ldInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.3
+raidLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   raid0(0),
+                   raid1(1),
+                   raid5(5),
+                   raid6(6),
+                   raid00(16),
+                   raid10(17),
+                   raid1E(18),
+                   raid50(19),
+                   raid60(20),
+                   raid1E-rlq0(21),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID level
+"
+    ::= {ldInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.4
+memDiskNum OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID members count
+"
+    ::= {ldInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.5
+ldState OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   optimal(0),
+                   degraded(1),
+                   offline(2),
+                   failed(3),
+                   partiallyDegraded(4),
+                   initializing(5),
+                   clean(6),
+                   active(7),
+                   recovering(8),
+                   resyncing(9),
+                   reshaping(10),
+                   checking(11),
+                   ok(12),
+                   notConfigured(13),
+                   interimRecovery(14),
+                   readyForRecovery(15),
+                   wrongDriveReplaced(16),
+                   driveImproperlyConnected(17),
+                   hardwareIsOverheating(18),
+                   hardwareHasOverheated(19),
+                   expanding(20),
+                   notYetAvailable(21),
+                   queuedForExpansion(22),
+                   disabledFromSCSIIDConflict(23),
+                   ejected(24),
+                   eraseInProgress(25),
+                   unused(26),
+                   readyToPerformPredictiveSpareRebuild(27),
+                   rPIInProgress(28),
+                   rPIQueued(29),
+                   encryptedVolumeWithoutKey(30),
+                   plaintextVolumeRejectedInEncryptingMode(31),
+                   encryptionMigration(32),
+                   encryptedVolumeRekeying(33),
+                   encryptedVolumeEncryptionOff(34),
+                   volumeEncodeRequested(35),
+                   encryptedVolumeRekeyRequested(36),
+                   unsupportedOnThisController(37),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID state
+"
+    ::= {ldInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.6
+rebuildProgInfo OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID rebuild progress
+"
+    ::= {ldInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.7
+ldIOPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   cacheIO(0),
+                   directIO(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID IO policy
+"
+    ::= {ldInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.8
+ldPad OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved
+"
+    ::= {ldInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.9
+ldAccessPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   readWrite(0),
+                   readOnly(1),
+                   blocked(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID access policy
+"
+    ::= {ldInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.10
+ldDiskCachePolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unChange(0),
+                   enable(1),
+                   disable(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID member disk cache policy
+"
+    ::= {ldInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.11
+ldReadAheadPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   noReadAhead(0),
+                   readAhead(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID read ahead policy
+"
+    ::= {ldInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.12
+ldWritePolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   writeThrough(0),
+                   writeBack(1),
+                   alwaysWriteBack(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID write policy
+"
+    ::= {ldInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.13
+ldMemDiskSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID members bit map,if bit n is 1,disk in slot n is member of this
+          raid. Only support R5300G4,if value is 0, not support."
+    ::= {ldInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.14
+ldStripeSize OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(65535)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID stripe size
+"
+    ::= {ldInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.15
+ldCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID capacity
+"
+    ::= {ldInfoEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.16
+virtualDriveName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID name
+"
+    ::= {ldInfoEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.38.1.17
+vdIndexInCtrl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAID index in controller
+"
+    ::= {ldInfoEntry 17}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39
+portInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PortInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the net port information"
+    ::= {bmc 39}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1
+portInfoEntry OBJECT-TYPE
+    SYNTAX          PortInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the portInfoTable."
+    INDEX { 
+            cardIndex,
+            portIndex
+          }
+    ::= {portInfoTable 1}
+PortInfoEntry ::= 
+    SEQUENCE { 
+        cardIndex               Unsigned32, 
+        portIndex               Unsigned32, 
+        linkStatus              Unsigned32, 
+        speed                   Unsigned32, 
+        currentSpeed            Unsigned32, 
+        duplex                  Unsigned32, 
+        negoMode                Unsigned32, 
+        mac                     DisplayString, 
+        resv1                   DisplayString, 
+        resv2                   DisplayString, 
+        portInterfaceType       Unsigned32, 
+        lldpEnable              Unsigned32, 
+        workMode                DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.1
+cardIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet card index, start from 0
+"
+    ::= {portInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.2
+portIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port index
+"
+    ::= {portInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.3
+linkStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   down(0), 
+                   up(1), 
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port link status
+"
+    ::= {portInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.4
+speed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed10M(0), 
+                   speed100M(1), 
+                   speed1G(2), 
+                   speed10G(3), 
+                   speed40G(4),
+                   speed25G(5),
+                   speed100G(6),
+                   speed20G(7),
+                   speed50G(8),
+                   speed80G(9),
+                   speed200G(10),
+                   speed400G(11),
+                   speed800G(12),
+                   na(15)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nominal speed(bit/s)
+"
+    ::= {portInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.5
+currentSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed10M(0), 
+                   speed100M(1), 
+                   speed1G(2), 
+                   speed10G(3), 
+                   speed40G(4),
+                   speed25G(5),
+                   speed100G(6),
+                   speed20G(7),
+                   speed50G(8),
+                   speed80G(9),
+                   speed200G(10),
+                   speed400G(11),
+                   speed800G(12),
+                   na(15)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current speed(bit/s)
+"
+    ::= {portInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.6
+duplex OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   halfDuplex(0), 
+                   fullDuplex(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port working mode
+"
+    ::= {portInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.7
+negoMode OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   autoNegotiated(0),
+                   forceMode(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Negotiate mode
+"
+    ::= {portInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.8
+mac OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address
+"
+    ::= {portInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.9
+resv1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved information 1
+"
+    ::= {portInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.10
+resv2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved information 2
+"
+    ::= {portInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.11
+portInterfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   electricalPort(0),    
+                   opticalPort(1), 
+                   serdes(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port interface type
+"
+    ::= {portInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.12
+lldpEnable OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   true(1),
+                   false(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port lldp enabled status
+"
+    ::= {portInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.39.1.13
+workMode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port working mode
+"
+    ::= {portInfoEntry 13}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.40
+netCardStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NetCardStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containning all nic health status"
+    ::= {bmc 40}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.40.1
+netCardStatusEntry OBJECT-TYPE
+    SYNTAX          NetCardStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the netCardStatusTable."
+    INDEX { 
+            cardType,
+            cardSlot
+          }
+    ::= {netCardStatusTable 1}
+NetCardStatusEntry ::= 
+    SEQUENCE { 
+        cardType                Unsigned32, 
+        cardSlot                Unsigned32, 
+        cardStatus              Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.40.1.1
+cardType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   embedded(0),
+                   pcie(1),
+                   ocp(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "net card type
+"
+    ::= {netCardStatusEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.40.1.2
+cardSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "net card slot number
+"
+    ::= {netCardStatusEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.40.1.3
+cardStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(1),
+                   unhealthy(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "net card health status
+"
+    ::= {netCardStatusEntry 3}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.41
+boardCpuHealthStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardCpuHealthStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the cpu health status."
+    ::= {bmc 41}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.41.1
+boardCpuHealthStatusEntry OBJECT-TYPE
+    SYNTAX          BoardCpuHealthStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardCpuHealthStatusTable."
+    INDEX { 
+            boardCpuIndex
+          }
+    ::= {boardCpuHealthStatusTable 1}
+BoardCpuHealthStatusEntry ::= 
+    SEQUENCE { 
+        boardCpuIndex           Unsigned32, 
+        boardCpuStatus          Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.41.1.1
+boardCpuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU Index
+"
+    ::= {boardCpuHealthStatusEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.41.1.2
+boardCpuStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(0),
+                   unhealthy(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "CPU health status info
+"
+    ::= {boardCpuHealthStatusEntry 2}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42
+boardpciedeviceInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardpciedeviceInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the pcie dev information"
+    ::= {bmc 42}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1
+boardpciedeviceInfoEntry OBJECT-TYPE
+    SYNTAX          BoardpciedeviceInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the boardpciedeviceInfoTable."
+    INDEX { 
+            pcieDeviceSlotNumber,
+            pcieDeviceID
+          }
+    ::= {boardpciedeviceInfoTable 1}
+BoardpciedeviceInfoEntry ::= 
+    SEQUENCE { 
+        pcieDeviceSlotNumber    Unsigned32, 
+        classCode               Unsigned32, 
+        pcieManufacturer        DisplayString, 
+        pcieModel               DisplayString, 
+        pcieName                DisplayString, 
+        description             DisplayString, 
+        pcieId                  DisplayString, 
+        pcieHealth              DisplayString, 
+        pcieCardType            DisplayString, 
+        maxLanes                Unsigned32, 
+        pcieFirmwareVersion     DisplayString, 
+        pcieSerialNumber        DisplayString, 
+        lanesInUse              Unsigned32, 
+        pcieDeviceID            Unsigned32, 
+        pcieBDF                 DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.1
+pcieDeviceSlotNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie device slot number
+"
+    ::= {boardpciedeviceInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.2
+classCode OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   storage(1),
+                   network(2),
+                   display(3),
+                   multimedia(4),
+                   memoryController(5),
+                   bridge(6),
+                   simpleCommunication(7),
+                   basicSystemPeripheral(8),
+                   input(9),
+                   castle(10),
+                   processor(11),
+                   serialBusController(12),
+                   wirelessController(13),
+                   integratedIOController(14),
+                   satelliteCommunicationController(15),
+                   encryptionAndDecryptionControlleR(16),
+                   dataAcquisitionAndSignalProcessingController(17),
+                   processingAccelerators(18),
+                   unsupported(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIE class code
+            1 -- Mass storage controller
+            2 -- Network controller
+            3 -- Display controller
+            4 -- Multimedia device
+            5 -- Memory controller
+            6 -- Bridge device
+            7 -- Simple communication controllers
+            8 -- Base system peripherals
+            9 -- Input devices
+            10 -- Docking stations
+            11 -- Processors
+            12 -- Serial bus controllers
+            13 -- Wireless controller
+            14 -- Intelligent I/O controllers
+            15 -- Satellite communication controllers
+            16 -- Encryption/Decryption controllers
+            17 -- Data acquisition and signal processing controllers
+            18 -- Processing Accelerators
+            19-254 -- Reserved
+            255 -- Device does not fit in any defined classes"
+    ::= {boardpciedeviceInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.3
+pcieManufacturer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie manufacturer
+"
+    ::= {boardpciedeviceInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.4
+pcieModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie model
+"
+    ::= {boardpciedeviceInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.5
+pcieName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie name
+"
+    ::= {boardpciedeviceInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.6
+description OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "description
+"
+    ::= {boardpciedeviceInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.7
+pcieId OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie id
+"
+    ::= {boardpciedeviceInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.8
+pcieHealth OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie health
+"
+    ::= {boardpciedeviceInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.9
+pcieCardType OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie card type
+"
+    ::= {boardpciedeviceInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.10
+maxLanes OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "max lanes
+"
+    ::= {boardpciedeviceInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.11
+pcieFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie Firmware Version
+"
+    ::= {boardpciedeviceInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.12
+pcieSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie Serial Number
+"
+    ::= {boardpciedeviceInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.13
+lanesInUse OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie lanes In Use
+"
+    ::= {boardpciedeviceInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.14
+pcieDeviceID OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie device id
+"
+    ::= {boardpciedeviceInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.42.1.15
+pcieBDF OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "pcie bus device func
+"
+    ::= {boardpciedeviceInfoEntry 15}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48
+gpuInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF GpuInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the gpu  information"
+    ::= {bmc 48}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1
+gpuInfoEntry OBJECT-TYPE
+    SYNTAX          GpuInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the gpuInfoTable."
+    INDEX { 
+            gpuPcieSlot,
+            gpuId
+          }
+    ::= {gpuInfoTable 1}
+GpuInfoEntry ::= 
+    SEQUENCE { 
+        gpuPcieSlot             Unsigned32, 
+        gpuId                   Unsigned32, 
+        gpuMarketingName        DisplayString, 
+        gpuPartNum              DisplayString, 
+        gpuSerialNum            DisplayString, 
+        gpuFirmwareVer          DisplayString, 
+        gpuBuildDate            DisplayString, 
+        gpuCurrentPower         Integer32, 
+        gpuCurrentTemp          Unsigned32, 
+        gpuMemorySize           Integer32, 
+        gpuManufacture          DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.1
+gpuPcieSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU PCIE slot number
+"
+    ::= {gpuInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.2
+gpuId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU id
+"
+    ::= {gpuInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.3
+gpuMarketingName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU device type
+"
+    ::= {gpuInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.4
+gpuPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU part number
+"
+    ::= {gpuInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.5
+gpuSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU serial number
+"
+    ::= {gpuInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.6
+gpuFirmwareVer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU firmware version
+"
+    ::= {gpuInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.7
+gpuBuildDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..11))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU build date
+"
+    ::= {gpuInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.8
+gpuCurrentPower OBJECT-TYPE
+    SYNTAX      Integer32 {
+                   na(4294967295)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU current power(mW)
+"
+    ::= {gpuInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.9
+gpuCurrentTemp OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU current temperature
+"
+    ::= {gpuInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.10
+gpuMemorySize OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU memory size(GB)
+"
+    ::= {gpuInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.48.1.11
+gpuManufacture OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "GPU Manufacture
+"
+    ::= {gpuInfoEntry 11}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49
+nvmeAddInCardInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NvmeAddInCardInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the nvme AIC information"
+    ::= {bmc 49}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1
+nvmeAddInCardInfoEntry OBJECT-TYPE
+    SYNTAX          NvmeAddInCardInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the nvmeAddInCardInfoTable."
+    INDEX { 
+            pcieSlot
+          }
+    ::= {nvmeAddInCardInfoTable 1}
+NvmeAddInCardInfoEntry ::= 
+    SEQUENCE { 
+        pcieSlot                Unsigned32, 
+        aicMediaType            Unsigned32, 
+        aicTemperature          Unsigned32, 
+        aicHealth               Unsigned32, 
+        aicModelInfo            DisplayString, 
+        aicVendorInfo           DisplayString, 
+        aicSerialNumber         DisplayString, 
+        aicRawCapacity          Unsigned32, 
+        aicLifeUsed             Unsigned32, 
+        aicInterfaceType        Unsigned32, 
+        aicPartNumber           DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.1
+pcieSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Pcie slot number
+"
+    ::= {nvmeAddInCardInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.2
+aicMediaType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   hdd(0),
+                   ssd(1),
+                   ssmFlash(2)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "media type
+"
+    ::= {nvmeAddInCardInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.3
+aicTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "temperature
+"
+    ::= {nvmeAddInCardInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.4
+aicHealth OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   unhealthy(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "health
+"
+    ::= {nvmeAddInCardInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.5
+aicModelInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "model information
+"
+    ::= {nvmeAddInCardInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.6
+aicVendorInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "vendor information
+"
+    ::= {nvmeAddInCardInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.7
+aicSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "serial number
+"
+    ::= {nvmeAddInCardInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.8
+aicRawCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "raw capacity(GB).
+"
+    ::= {nvmeAddInCardInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.9
+aicLifeUsed OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "life used,only NVMe disk support.0xff means not support.
+"
+    ::= {nvmeAddInCardInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.10
+aicInterfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   parallelSCSI(1),
+                   sas(2),
+                   sata(3),
+                   fc(4),
+                   pcie(5)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "interface type
+"
+    ::= {nvmeAddInCardInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.49.1.11
+aicPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "part number
+"
+    ::= {nvmeAddInCardInfoEntry 11}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50
+ldPdMemberTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF LdPdMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the  member disks information in virtual disks."
+    ::= {bmc 50}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1
+ldPdMemberEntry OBJECT-TYPE
+    SYNTAX          LdPdMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the ldPdMemberTable."
+    INDEX { 
+            mdControllerIndex,
+            logicalDriveIndex,
+            memberDiskSlot
+          }
+    ::= {ldPdMemberTable 1}
+LdPdMemberEntry ::= 
+    SEQUENCE { 
+        mdControllerIndex       Unsigned32, 
+        logicalDriveIndex       Unsigned32, 
+        memberDiskSlot          Unsigned32, 
+        mdNegoLinkSpeed         Unsigned32, 
+        mdMediaType             Unsigned32, 
+        mdRotateRate            Unsigned32, 
+        mdTemperature           Unsigned32, 
+        mdStatusInController    Unsigned32, 
+        mdHealth                Unsigned32, 
+        mdModelInfo             DisplayString, 
+        mdVendorInfo            DisplayString, 
+        mdSerialNumber          DisplayString, 
+        mdFirmwareVersion       DisplayString, 
+        mdAPortSasAddress       DisplayString, 
+        mdinterfaceType         Unsigned32, 
+        mdDiskSize              Unsigned32, 
+        mdRawCapacity           Unsigned32, 
+        mdLifeUsed              Unsigned32, 
+        mdUsageInfo             Unsigned32, 
+        mdRawCapacityBytes      DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.1
+mdControllerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Index of controller that containing virtualDriveIndex
+"
+    ::= {ldPdMemberEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.2
+logicalDriveIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Logical disk index
+"
+    ::= {ldPdMemberEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.3
+memberDiskSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(16711935)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk slot number(the high 16 bits are stand for zone, the low 16 bits
+          are stand for slik)"
+    ::= {ldPdMemberEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.4
+mdNegoLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed3G(0),
+                   speed6G(1),
+                   speed12G(2),
+                   speed1p5G(3),
+                   speed8G(5),
+                   speed16G(6),
+                   speed32G(7),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk link speed
+         (speed1p5G:speed1.5G)"
+    ::= {ldPdMemberEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.5
+mdMediaType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   hdd(0),
+                   ssd(1),
+                   ssmFlash(2)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk media type
+"
+    ::= {ldPdMemberEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.6
+mdRotateRate OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   speed5400RPM(0),
+                   speed7200RPM(1),
+                   speed10000RPM(2),
+                   speed10025RPM(3),
+                   speed15000RPM(4),
+                   ssd(5),
+                   speed10500RPM(6),
+                   speed10520RPM(7),
+                   speed15030RPM(8),
+                   speed15052RPM(9),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk rotate rate
+"
+    ::= {ldPdMemberEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.7
+mdTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk temperature
+"
+    ::= {ldPdMemberEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.8
+mdStatusInController OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unconfiguredGood(0),
+                   unconfiguredBad(1),
+                   online(2),
+                   rebuilding(3),
+                   offline(4),
+                   globalHSP(5),
+                   failed(6),
+                   raw(7),
+                   ready(8),
+                   dead(9),
+                   dedicatedHSP(10),
+                   foreign(12),
+                   jbod(13),
+                   configuredShielded(14),
+                   unknown(15),
+                   journal(16),
+                   active(17),
+                   copyBack(18),
+                   failedDueToPSA(19),
+                   unsupportedNoLicense(20),
+                   predictiveFailure(21),
+                   predictiveFailureWornOut(22),
+                   transientDrive(23),
+                   erasingOffline(24),
+                   invalidDriveSize(25),
+                   firmwareUpdateRequired(26),
+                   exposedToOS(27),
+                   maskedWithInvalidCCM(28),
+                   unsupportedForConfig(29),
+                   rebuildQueued(30),
+                   ok(31),
+                   na(11)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk status in controller
+"
+    ::= {ldPdMemberEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.9
+mdHealth OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   warning(1),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk health
+"
+    ::= {ldPdMemberEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.10
+mdModelInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk model information
+"
+    ::= {ldPdMemberEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.11
+mdVendorInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk vendor information
+"
+    ::= {ldPdMemberEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.12
+mdSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk serial number
+"
+    ::= {ldPdMemberEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.13
+mdFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk firmware version
+"
+    ::= {ldPdMemberEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.14
+mdAPortSasAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk sas address
+"
+    ::= {ldPdMemberEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.15
+mdinterfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   parallelSCSI(1),
+                   sas(2),
+                   sata(3),
+                   fc(4),
+                   pcie(5),
+                   nvme(6)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk interface type
+"
+    ::= {ldPdMemberEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.16
+mdDiskSize OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   size2p5(0),
+                   size3p5(1),
+                   size80x22x3p5(2),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk size
+"
+    ::= {ldPdMemberEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.17
+mdRawCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk raw capacity(GB).
+"
+    ::= {ldPdMemberEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.18
+mdLifeUsed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk life used.0xff means not support.
+"
+    ::= {ldPdMemberEntry 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.19
+mdUsageInfo OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   readyForAssignment(0),
+                   dataDriver(1),
+                   autoReplaceSpare(2),
+                   shareableStandbySpare(3),
+                   shareableActiveSpare(4),
+                   transientDataDrive(5),
+                   lUCacheDataDrive(6),
+                   hbaDrive(7),
+                   transientUnassigned(8),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk usage for PMC
+"
+    ::= {ldPdMemberEntry 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.50.1.20
+mdRawCapacityBytes OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Disk raw capacity(Bytes).
+"
+    ::= {ldPdMemberEntry 20}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51
+alarmInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlarmInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the current alarm information"
+    ::= {bmc 51}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1
+alarmInfoEntry OBJECT-TYPE
+    SYNTAX          AlarmInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the alarmInfoTable."
+    INDEX { 
+            alarmID
+          }
+    ::= {alarmInfoTable 1}
+AlarmInfoEntry ::= 
+    SEQUENCE { 
+        alarmID                 Unsigned32, 
+        alarmTime               DisplayString, 
+        alarmType               Unsigned32, 
+        restoreType             Unsigned32, 
+        alarmLevel              Unsigned32, 
+        deviceType              Unsigned32, 
+        deviceID                Unsigned32, 
+        reserved1               Unsigned32, 
+        reserved2               Unsigned32, 
+        reserved3               Unsigned32, 
+        reserved4               Unsigned32, 
+        crcCode1                Unsigned32, 
+        crcCode2                Unsigned32, 
+        crcCode3                Unsigned32, 
+        crcCode4                Unsigned32, 
+        reserved5               Unsigned32, 
+        reserved6               Unsigned32, 
+        trapOid                 DisplayString, 
+        alarmDescription        DisplayString, 
+        alarmUTCTime            DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.1
+alarmID OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm ID
+"
+    ::= {alarmInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.2
+alarmTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm Local time
+"
+    ::= {alarmInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.3
+alarmType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   alarm(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm Flag:
+            1 -- Alarm"
+    ::= {alarmInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.4
+restoreType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   normalRestore(1),
+                   bmcRebootRestore(8)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm restore type:
+            0  -- Null
+            1  -- Normal restored              
+            8  -- BMC Reboot restored"
+    ::= {alarmInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.5
+alarmLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(0),
+                   critical(1),
+                   major(2),
+                   unknown(3),
+                   minor(4),
+                   inform(5)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm Level:
+            0 -- N/A
+            1 -- Critical
+            2 -- Major
+            3 -- Unknown
+            4 -- Minor
+            5 -- Inform"
+    ::= {alarmInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.6
+deviceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   mainBoard(0),
+                   psu(1),
+                   fan(4),
+                   cpu(64),
+                   disk(65),
+                   memory(66),
+                   io-Module(67),
+                   gpu(68),
+                   smartCard(69),
+                   aiCard(70),
+                   mainBoardNicCard(71),
+                   mainBoardOcpCard(72),
+                   opticalModule(73),
+                   device(193)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm device type:
+            0  -- mainBoard
+            1  -- psu
+            4  -- fan
+            64 -- cpu
+            65 -- disk
+            66 -- memory
+            67 -- io-Module
+            68 -- gpu
+            69 -- smartCard
+            70 -- aiCard
+            71 -- mainBoardNicCard
+            72 -- mainBoardOcpCard
+            73 -- opticalModule
+            193-- device"
+    ::= {alarmInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.7
+deviceID OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm device ID
+"
+    ::= {alarmInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.8
+reserved1 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved1
+"
+    ::= {alarmInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.9
+reserved2 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved2
+"
+    ::= {alarmInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.10
+reserved3 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved3
+"
+    ::= {alarmInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.11
+reserved4 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved4
+"
+    ::= {alarmInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.12
+crcCode1 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm CRC code1
+"
+    ::= {alarmInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.13
+crcCode2 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm CRC code2
+"
+    ::= {alarmInfoEntry 13}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.14
+crcCode3 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm CRC code3
+"
+    ::= {alarmInfoEntry 14}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.15
+crcCode4 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm CRC code4
+"
+    ::= {alarmInfoEntry 15}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.16
+reserved5 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved5
+"
+    ::= {alarmInfoEntry 16}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.17
+reserved6 OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reserved6
+"
+    ::= {alarmInfoEntry 17}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.18
+trapOid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm Trap OID
+"
+    ::= {alarmInfoEntry 18}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.19
+alarmDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm description
+"
+    ::= {alarmInfoEntry 19}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.51.1.20
+alarmUTCTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Alarm UTC time
+"
+    ::= {alarmInfoEntry 20}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52
+fcInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF FcInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the fc card information"
+    ::= {bmc 52}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1
+fcInfoEntry OBJECT-TYPE
+    SYNTAX          FcInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the fcInfoTable."
+    INDEX { 
+            fcIndex
+          }
+    ::= {fcInfoTable 1}
+FcInfoEntry ::= 
+    SEQUENCE { 
+        fcIndex                 Unsigned32, 
+        fcCardName              DisplayString, 
+        fcManuFacture           DisplayString, 
+        fcSerialNum             DisplayString, 
+        fcChipProductName       DisplayString, 
+        fcChipManuFacture       DisplayString, 
+        fcFirmwareVersion       DisplayString, 
+        fcDriverName            DisplayString, 
+        fcDriverVersion         DisplayString, 
+        fcTotalPort             Unsigned32, 
+        fcPcieSlot              Unsigned32, 
+        fcCardStatus            Unsigned32, 
+        fcPartNum               DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.1
+fcIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC card index, start from 0
+"
+    ::= {fcInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.2
+fcCardName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's card name
+"
+    ::= {fcInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.3
+fcManuFacture OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's manufacture name
+"
+    ::= {fcInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.4
+fcSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's serial number
+"
+    ::= {fcInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.5
+fcChipProductName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's card model
+"
+    ::= {fcInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.6
+fcChipManuFacture OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's chip manufacture name
+"
+    ::= {fcInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.7
+fcFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's firmware version
+"
+    ::= {fcInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.8
+fcDriverName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's inband driver name
+"
+    ::= {fcInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.9
+fcDriverVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's inband driver version
+"
+    ::= {fcInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.10
+fcTotalPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's port count
+"
+    ::= {fcInfoEntry 10}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.11
+fcPcieSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's location
+"
+    ::= {fcInfoEntry 11}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.12
+fcCardStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   healthy(1),
+                   unhealthy(0),
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC's card health status
+"
+    ::= {fcInfoEntry 12}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.52.1.13
+fcPartNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "fc part number
+"
+    ::= {fcInfoEntry 13}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53
+fcPortInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF FcPortInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing all of the FC card port information"
+    ::= {bmc 53}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1
+fcPortInfoEntry OBJECT-TYPE
+    SYNTAX          FcPortInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the fcPortInfoTable."
+    INDEX { 
+            fcSrcCardIndex,
+            fcPortIndex
+          }
+    ::= {fcPortInfoTable 1}
+FcPortInfoEntry ::= 
+    SEQUENCE { 
+        fcSrcCardIndex          Unsigned32, 
+        fcSrcCardName           DisplayString, 
+        fcPortIndex             Unsigned32, 
+        fcPortState             Unsigned32, 
+        fcLinkSpeed             Unsigned32, 
+        fcSupportedSpeed        Unsigned32, 
+        fcProtocolType          Unsigned32, 
+        fcWwnn                  DisplayString, 
+        fcWwpn                  DisplayString, 
+        fcPortInterfaceType     Unsigned32 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.1
+fcSrcCardIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC card index, start from 0
+"
+    ::= {fcPortInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.2
+fcSrcCardName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC card name
+"
+    ::= {fcPortInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.3
+fcPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC port index
+"
+    ::= {fcPortInfoEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.4
+fcPortState OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   down(0), 
+                   up(1), 
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC port link status
+"
+    ::= {fcPortInfoEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.5
+fcLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC link speed(Gbit/s)
+"
+    ::= {fcPortInfoEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.6
+fcSupportedSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   supportSpeed4-8-16G(28),
+                   supportSpeed8-16-32G(56),
+                   supportSpeed16-32G(48)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC supported speed(Gbit/s)
+"
+    ::= {fcPortInfoEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.7
+fcProtocolType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   unknown(0),
+                   fc(1), 
+                   na(255)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC port protocol type
+"
+    ::= {fcPortInfoEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.8
+fcWwnn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC port wwnn
+"
+    ::= {fcPortInfoEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.9
+fcWwpn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC port wwpn
+"
+    ::= {fcPortInfoEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.53.1.10
+fcPortInterfaceType OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   opticalPort(1)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FC Port interface type
+"
+    ::= {fcPortInfoEntry 10}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.56
+pcieSlotInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PcieSlotInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing PCIe slot inforomation"
+    ::= {bmc 56}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.56.1
+pcieSlotInfoEntry OBJECT-TYPE
+    SYNTAX          PcieSlotInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the pcieSlotInfoTable."
+    INDEX { 
+            pcieSlotIndex
+          }
+    ::= {pcieSlotInfoTable 1}
+PcieSlotInfoEntry ::= 
+    SEQUENCE { 
+        pcieSlotIndex           Unsigned32, 
+        pcieSlotSpeed           DisplayString, 
+        pcieSlotIdentifier      DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.56.1.1
+pcieSlotIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIe Slot Index
+"
+    ::= {pcieSlotInfoEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.56.1.2
+pcieSlotSpeed OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIe Slot Rated  Speed
+"
+    ::= {pcieSlotInfoEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.56.1.3
+pcieSlotIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PCIe Slot Identifier for User
+"
+    ::= {pcieSlotInfoEntry 3}
+
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60
+temperatureProbeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TemperatureProbeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "A table containing the temperature information"
+    ::= {bmc 60}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1
+temperatureProbeEntry OBJECT-TYPE
+    SYNTAX          TemperatureProbeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "An entry (conceptual row) in the temperatureProbeTable."
+    INDEX { 
+            temperatureIndex
+          }
+    ::= {temperatureProbeTable 1}
+TemperatureProbeEntry ::= 
+    SEQUENCE { 
+        temperatureIndex        Unsigned32, 
+        temertatureType         DisplayString, 
+        temperatureAlarmStatus    Unsigned32, 
+        temperatureReading      DisplayString, 
+        temperatureUpperNonRecoverableThreshold    DisplayString, 
+        temperatureUpperCriticalThreshold    DisplayString, 
+        temperatureUpperNonCriticalThreshold    DisplayString, 
+        temperatureLowerNonRecoverableThreshold    DisplayString, 
+        temperatureLowerCriticalThreshold    DisplayString, 
+        temperatureLowerNonCriticalThreshold    DisplayString 
+    } 
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.1
+temperatureIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Index
+"
+    ::= {temperatureProbeEntry 1}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.2
+temertatureType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temertature Type
+"
+    ::= {temperatureProbeEntry 2}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.3
+temperatureAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                   ok(0),
+                   minor(1),
+                   major(2),
+                   critical(3),
+                   unkown(4)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature AlarmStatus
+"
+    ::= {temperatureProbeEntry 3}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.4
+temperatureReading OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Reading Value
+"
+    ::= {temperatureProbeEntry 4}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.5
+temperatureUpperNonRecoverableThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Upper Non-recoverable
+"
+    ::= {temperatureProbeEntry 5}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.6
+temperatureUpperCriticalThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Upper Critical
+"
+    ::= {temperatureProbeEntry 6}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.7
+temperatureUpperNonCriticalThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Upper Non-critical
+"
+    ::= {temperatureProbeEntry 7}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.8
+temperatureLowerNonRecoverableThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Lower Non-recoverable
+"
+    ::= {temperatureProbeEntry 8}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.9
+temperatureLowerCriticalThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Lower Critical
+"
+    ::= {temperatureProbeEntry 9}
+-- 1.3.6.1.4.1.3902.6053.19.1.3.2.60.1.10
+temperatureLowerNonCriticalThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature Lower Non-critical
+"
+    ::= {temperatureProbeEntry 10}
+
+END
