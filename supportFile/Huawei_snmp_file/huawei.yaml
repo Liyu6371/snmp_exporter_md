@@ -1,0 +1,372 @@
+if_mib:
+    walk:
+    - 1.3.6.1.2.1.2.2.1.11
+    - 1.3.6.1.2.1.2.2.1.13
+    - 1.3.6.1.2.1.2.2.1.14
+    - 1.3.6.1.2.1.2.2.1.17
+    - 1.3.6.1.2.1.2.2.1.19
+    - 1.3.6.1.2.1.2.2.1.2
+    - 1.3.6.1.2.1.2.2.1.20
+    - 1.3.6.1.2.1.2.2.1.7
+    - 1.3.6.1.2.1.2.2.1.8
+    - 1.3.6.1.2.1.31.1.1.1.10
+    - 1.3.6.1.2.1.31.1.1.1.15
+    - 1.3.6.1.2.1.31.1.1.1.2
+    - 1.3.6.1.2.1.31.1.1.1.3
+    - 1.3.6.1.2.1.31.1.1.1.4
+    - 1.3.6.1.2.1.31.1.1.1.5
+    - 1.3.6.1.2.1.31.1.1.1.6
+    - 1.3.6.1.4.1.2011.2.235.1.1.1.12
+    - 1.3.6.1.4.1.2011.2.235.1.1.1.23
+    - 1.3.6.1.4.1.2011.2.235.1.1.1.25
+    - 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.3
+    - 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.6
+    - 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.2
+    - 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.4
+    - 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.7
+    - 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.2
+    - 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.7
+    - 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.2
+    - 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.6
+    - 1.3.6.1.4.1.2011.2.235.1.1.26.50.1.3
+    - 1.3.6.1.4.1.2011.2.235.1.1.26.50.1.2
+
+    get:
+    - 1.3.6.1.6.3.10.2.1.3.0
+    metrics:
+    - name: CW_HuaweiHardware_systemPowerState
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.1.12
+      type: gauge
+      help: 电源状态
+      enum_values:
+        1: PowerOff
+        2: PowerOn
+    - name: CW_HuaweiHardware_systemCpuUsage
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.1.23
+      type: gauge
+      help: CPU使用率
+    - name: CW_HuaweiHardware_systemMemUsage
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.1.25
+      type: gauge
+      help: 内存使用率
+    - name: CW_HuaweiHardware_hardDiskStatus
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.3
+      type: gauge
+      help: 磁盘状态
+      indexes:
+      - labelname: hardDiskIndex
+        type: gauge
+      lookups:
+      - labels:
+        - hardDiskIndex
+        labelname: hardDiskDevicename
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.6
+        type: DisplayString
+      enum_values:
+        1: OK
+        2: Minor
+        3: Major
+        4: Critical
+        5: Absence
+        6: Unknown
+    - name: CW_HuaweiHardware_hardDiskCapacityInGB
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.12
+      type: gauge
+      help: 磁盘容量
+      indexes:
+      - labelname: hardDiskIndex
+        type: gauge
+      lookups:
+      - labels:
+        - hardDiskIndex
+        labelname: hardDiskDevicename
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.18.50.1.6
+        type: DisplayString
+    - name: CW_HuaweiHardware_raidControllerHealthStatus
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.7
+      type: gauge
+      help: Raid控制器状态
+      indexes:
+      - labelname: raidControllerIndex
+        type: gauge
+      lookups:
+      - labels:
+        - raidControllerIndex
+        labelname: raidControllerName
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.2
+        type: DisplayString
+      enum_values:
+        0: OK
+        65535: Unknown
+    - name: CW_HuaweiHardware_raidControllerMode
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.6
+      type: gauge
+      help: Raid控制器模式
+      indexes:
+      - labelname: raidControllerIndex
+        type: gauge
+      lookups:
+      - labels:
+        - raidControllerIndex
+        labelname: raidControllerName
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.36.50.1.2
+        type: DisplayString
+      enum_values:
+        1: RAID
+        2: HBA
+        3: JBOD
+        255: Unknown
+    - name: CW_HuaweiHardware_temperature
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.26.50.1.3
+      type: gauge
+      help: 设备温度
+      indexes:
+      - labelname: temperatureIndex
+        type: gauge
+      lookups:
+      - labels:
+        - temperatureIndex
+        labelname: temperatureObject
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.26.50.1.2
+        type: DisplayString
+      regex_extracts:
+        "Reading":
+        - value: $1
+          regex: ^\d{1,2}
+    - name: CW_HuaweiHardware_fanStatus
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.4
+      type: gauge
+      help: 风扇状态
+      indexes:
+      - labelname: fanIndex
+        type: gauge
+      lookups:
+      - labels:
+        - fanIndex
+        labelname: fanDevicename
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.7
+        type: DisplayString
+    - name: CW_HuaweiHardware_fanSpeed
+      oid: 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.2
+      type: gauge
+      help: 风扇转速
+      indexes:
+      - labelname: fanIndex
+        type: gauge
+      lookups:
+      - labels:
+        - fanIndex
+        labelname: fanDevicename
+        oid: 1.3.6.1.4.1.2011.2.235.1.1.8.50.1.7
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifInUcastPkts
+      oid: 1.3.6.1.2.1.2.2.1.11
+      type: counter
+      help: 端口单播包数【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifInDiscards
+      oid: 1.3.6.1.2.1.2.2.1.13
+      type: counter
+      help: 端口丢包数【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifInErrors
+      oid: 1.3.6.1.2.1.2.2.1.14
+      type: counter
+      help: 端口错包数【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifOutUcastPkts
+      oid: 1.3.6.1.2.1.2.2.1.17
+      type: counter
+      help: 端口单播包数【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifOutDiscards
+      oid: 1.3.6.1.2.1.2.2.1.19
+      type: counter
+      help: 端口丢包数【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifOutErrors
+      oid: 1.3.6.1.2.1.2.2.1.20
+      type: counter
+      help: 端口错包数【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifAdminStatus
+      oid: 1.3.6.1.2.1.2.2.1.7
+      type: gauge
+      help: 端口管理状态
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+      enum_values:
+        1: up
+        2: down
+        3: testing
+    - name: CW_HuaweiSwitch_ifOperStatus
+      oid: 1.3.6.1.2.1.2.2.1.8
+      type: gauge
+      help: 端口操作状态
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+      enum_values:
+        1: up
+        2: down
+        3: testing
+        4: unknown
+        5: dormant
+        6: notPresent
+        7: lowerLayerDown
+    - name: CW_HuaweiSwitch_ifHCOutOctets
+      oid: 1.3.6.1.2.1.31.1.1.1.10
+      type: counter
+      help: 端口流量【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifHighSpeed
+      oid: 1.3.6.1.2.1.31.1.1.1.15
+      type: gauge
+      help: 端口带宽
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifInMulticastPkts
+      oid: 1.3.6.1.2.1.31.1.1.1.2
+      type: counter
+      help: 端口多播包数【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifInBroadcastPkts
+      oid: 1.3.6.1.2.1.31.1.1.1.3
+      type: counter
+      help: 端口广播包数【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifOutMulticastPkts
+      oid: 1.3.6.1.2.1.31.1.1.1.4
+      type: counter
+      help: 端口多播包数【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifOutBroadcastPkts
+      oid: 1.3.6.1.2.1.31.1.1.1.5
+      type: counter
+      help: 端口广播包数【Out】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_ifHCInOctets
+      oid: 1.3.6.1.2.1.31.1.1.1.6
+      type: counter
+      help: 端口流量【In】
+      indexes:
+      - labelname: ifIndex
+        type: gauge
+      lookups:
+      - labels:
+        - ifIndex
+        labelname: ifDescr
+        oid: 1.3.6.1.2.1.2.2.1.2
+        type: DisplayString
+    - name: CW_HuaweiSwitch_snmpEngineTime
+      oid: 1.3.6.1.6.3.10.2.1.3
+      type: gauge
+      help: 设备运行时间

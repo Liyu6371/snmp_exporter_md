@@ -69,3 +69,7 @@ powerStatus OBJECT-TYPE                                                         
 ![有维度指标](./images/mibBrowser_4.png)
 
 #### （注意：无维度指标在尝试使用 snmpget 的时候需要在具体的 oid 后面进行补零；有维度的指标在尝试使用 snmpwalk 的时候不需要在具体的 oid 后面进行补零。）
+
+### 配置文件编写&模版
+supportFile 文件夹下存放了 huawei硬件的mib文件以及编写好的采集对应指标的配置文件。<p>
+格式可参考 supportFile/Huawei_snmp_file/huawei.yaml
